@@ -10,10 +10,10 @@ for(i in 1:length(asso)){
     li<-unlist(list)
     for(n in li){ma[i,as.numeric(n)+1]=1}
 }
-colnames(ma)=c("一","二","三","四","五","六","七","八","九","十")
+colnames(ma)=c("房价","开发商资金链","降息","土地市场","公积金新政","不动产登记","旧城改造","房产税改革","保障性住房","房地产成交量")
 d<-as(ma,"transactions")
 summary(d)
-rules <- apriori(d, parameter = list(support =0.01, confidence = 0.6, minlen = 2))  
+rules <- apriori(d, parameter = list(support =0.05, confidence = 0.5,target = "rules"))  
 summary(rules)
 inspect(rules[1:3])
 ordered_rules <- sort(rules, by="lift",)  
@@ -26,23 +26,23 @@ library("arulesViz")
 library("RColorBrewer")
 
 Size<-size(rules) 
-itemFrequencyPlot(d,topN=5)
+itemFrequencyPlot(d)
 
-Tonerule<-subset(rules, items %in% c("一"))     ##the rules including topic one
+Tonerule<-subset(rules, items %in% c("房价"))     ##the rules including topic one
 inspect(Tonerule,decreasing=T,topN=5)
 
 plot(rules,control=list(jitter=2, col= rev(brewer.pal(9, "Greens")[4:9])),shading = "lift")   
 
 plot(rules, method="grouped",     
-     control=list(col = rev(brewer.pal(9, "Greens")))
+     control=list(col = rev(brewer.pal(9, "Greens"))))
 
 top.rules <- head(sort(rules, decreasing = TRUE, by = "lift"), 10)
 inspect(top.rules)
-plot(sort(rules, decreasing = TRUE, by = "lift")[1:20], measure="confidence", method="graph",   
-     control=list(type="items"),   
+plot(rules, measure="support", method="graph",   
+     control=list(type="items",arrowSize=0.3),   
      shading = "lift")
 
 
-windows();plot(rules, method="graph", control=list(type="items"))
+plot(rules, method="graph", control=list(type="items"),measure="support",interactive=TRUE)
 plot(rules, method="paracoord", control=list(reorder=TRUE))
-
+plot(rules,method="matrix",type="grid",reorder=TRUE)
